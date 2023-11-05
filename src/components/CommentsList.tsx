@@ -1,27 +1,25 @@
+import axios from "axios";
 import { useEffect, useState } from "react";
 import { Comment, User } from "../interfaces/CommentInterfaces";
 import CommentCard from "./CommentCard";
 import RepliesList from "./RepliesList";
+import { Stack } from "react-bootstrap";
+import AddComment from "./AddComment";
 
 export default function CommentsList() {
   const [comments, setComments] = useState<Comment[]>([]);
-  const [currentUser, setCurrentUser] = useState<User | null>(null); // Deklaruj currentUser i inicjalizuj jako null
+  const [currentUser, setCurrentUser] = useState<User | null>(null);
 
   const getData = async () => {
     try {
-      const response = await fetch("./src/data.json", {
-        headers: {
-          "Content-Type": "application/json",
-          Accept: "application/json",
-        },
-      });
-      const data = await response.json();
+      const response = await axios.get("./src/data.json");
+      const data = response.data;
       const comments = data["comments"];
       const user = data["currentUser"];
       setComments(comments);
-      setCurrentUser(user); // Ustaw currentUser na otrzymany użytkownik z danych
+      setCurrentUser(user);
     } catch (error) {
-      console.error("Błąd podczas pobierania danych:", error);
+      console.error("Error while fetching data:", error);
     }
   };
 
@@ -29,15 +27,20 @@ export default function CommentsList() {
     getData();
   }, []);
 
+
   return (
-    <div>
+    <Stack direction="vertical" gap={3}>
       {comments.map((comment) => (
-        <div key={comment.id}>
-          <CommentCard comment={comment} currentUser={currentUser} />{" "}
-          {/* Przekaż currentUser jako prop */}
-          {comment.replies.length > 0 && <RepliesList comment={comment} />}
-        </div>
+        <Stack direction="vertical" gap={3} key={comment.id}>
+          {currentUser !== undefined && (
+            <CommentCard comment={comment} currentUser={currentUser} />
+          )}
+          {comment.replies && comment.replies.length > 0 && <RepliesList comment={comment} currentUser={currentUser} />}
+
+        </Stack>
       ))}
-    </div>
+      {currentUser && <AddComment user={currentUser} />}
+
+    </Stack>
   );
 }

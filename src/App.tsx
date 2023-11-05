@@ -1,14 +1,16 @@
-import { useState } from "react";
-import reactLogo from "./assets/react.svg";
-import "./App.scss";
+
+import "./styles/App.scss";
 import CommentsList from "./components/CommentsList";
+import { Container } from "react-bootstrap";
 
 function App() {
-  const [count, setCount] = useState(0);
+
 
   return (
     <div className="App">
-      <CommentsList />
+      <Container>
+        <CommentsList />
+      </Container>
     </div>
   );
 }
